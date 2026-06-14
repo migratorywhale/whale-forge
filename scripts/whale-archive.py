@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Forge a Claude Code session and archive the old JSONL to Markdown.
 
-This is a convenience wrapper around forge-reload.py:
+This is a convenience wrapper around whale-forge.py:
 
-1. run forge-reload.py to create a new session jsonl;
-2. write ~/.claude/forge-ready/<old>.signal with the new session id;
+1. run whale-forge.py to create a new session jsonl;
+2. write ~/.claude/whale-ready/<old>.signal with the new session id;
 3. run jsonl2md.py on the old session, if you have such a converter.
 
 The source JSONL is never modified.
@@ -34,11 +34,11 @@ def default_project_dir() -> Path:
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_PROJECT_DIR = default_project_dir()
-DEFAULT_THRESHOLD = int(os.environ.get("FORGE_THRESHOLD", "950000"))
-FORGE_SCRIPT = Path(os.environ.get("FORGE_RELOAD_SCRIPT", str(SCRIPT_DIR / "forge-reload.py"))).expanduser()
+DEFAULT_THRESHOLD = int(os.environ.get("WHALE_FORGE_THRESHOLD", "950000"))
+WHALE_SCRIPT = Path(os.environ.get("WHALE_FORGE_SCRIPT", str(SCRIPT_DIR / "whale-forge.py"))).expanduser()
 JSONL2MD_SCRIPT = Path(os.environ.get("JSONL2MD_SCRIPT", str(Path.home() / "scripts" / "jsonl2md.py"))).expanduser()
-ARCHIVE_DIR = Path(os.environ.get("FORGE_ARCHIVE_DIR", str(Path.home() / ".claude" / "forge-archive"))).expanduser()
-SIGNAL_DIR = Path(os.environ.get("FORGE_SIGNAL_DIR", str(Path.home() / ".claude" / "forge-ready"))).expanduser()
+ARCHIVE_DIR = Path(os.environ.get("WHALE_ARCHIVE_DIR", str(Path.home() / ".claude" / "whale-archive"))).expanduser()
+SIGNAL_DIR = Path(os.environ.get("WHALE_SIGNAL_DIR", str(Path.home() / ".claude" / "whale-ready"))).expanduser()
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
@@ -90,12 +90,12 @@ def archive_source(source_path: Path, force: bool) -> tuple[bool, str]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Forge a session, write a forge-ready signal, and archive the old session to Markdown.",
+        description="Forge a session, write a whale-ready signal, and archive the old session to Markdown.",
     )
     parser.add_argument(
         "session",
         nargs="?",
-        help="source session id or jsonl path; omit to let forge-reload.py pick the latest session",
+        help="source session id or jsonl path; omit to let whale-forge.py pick the latest session",
     )
     parser.add_argument(
         "--project-dir",
@@ -106,18 +106,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--keep-tokens",
         type=int,
         default=DEFAULT_THRESHOLD,
-        help=f"tail token budget passed to forge-reload.py (default: {DEFAULT_THRESHOLD})",
+        help=f"tail token budget passed to whale-forge.py (default: {DEFAULT_THRESHOLD})",
     )
     parser.add_argument(
         "--threshold",
         type=int,
         default=DEFAULT_THRESHOLD,
-        help=f"threshold passed to forge-reload.py (default: {DEFAULT_THRESHOLD})",
+        help=f"threshold passed to whale-forge.py (default: {DEFAULT_THRESHOLD})",
     )
     parser.add_argument(
         "--no-force",
         action="store_true",
-        help="do not force forge; allow forge-reload.py to skip below threshold",
+        help="do not force forge; allow whale-forge.py to skip below threshold",
     )
     parser.add_argument(
         "--dry-run",
@@ -132,12 +132,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--min-pairs",
         type=int,
-        help="optional pass-through to forge-reload.py",
+        help="optional pass-through to whale-forge.py",
     )
     parser.add_argument(
         "--min-tool-rounds",
         type=int,
-        help="optional pass-through to forge-reload.py",
+        help="optional pass-through to whale-forge.py",
     )
     return parser
 
@@ -148,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
 
     cmd = [
         sys.executable,
-        str(FORGE_SCRIPT),
+        str(WHALE_SCRIPT),
     ]
     if args.session:
         cmd.append(args.session)
@@ -171,8 +171,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.min_tool_rounds is not None:
         cmd.extend(["--min-tool-rounds", str(args.min_tool_rounds)])
 
-    if not FORGE_SCRIPT.exists():
-        print(f"error: forge-reload.py not found: {FORGE_SCRIPT}", file=sys.stderr)
+    if not WHALE_SCRIPT.exists():
+        print(f"error: whale-forge.py not found: {WHALE_SCRIPT}", file=sys.stderr)
         return 2
 
     result = run(cmd, timeout=120)
@@ -186,12 +186,12 @@ def main(argv: list[str] | None = None) -> int:
 
     new_id = parse_forge_id(result.stdout or "", args.dry_run)
     if not new_id:
-        print("forge-archive: forge skipped; no archive written", file=sys.stderr)
+        print("whale-archive: forge skipped; no archive written", file=sys.stderr)
         return 0
 
     source_path = parse_source_path(result.stderr or "", project_dir, args.session)
     if source_path is None or not source_path.exists():
-        print("forge-archive: could not resolve source path; no archive written", file=sys.stderr)
+        print("whale-archive: could not resolve source path; no archive written", file=sys.stderr)
         return 2
 
     old_id = source_path.stem
@@ -208,7 +208,7 @@ def main(argv: list[str] | None = None) -> int:
     if archive_log:
         print(archive_log)
     if not ok:
-        print("forge-archive: forge succeeded but markdown archive failed", file=sys.stderr)
+        print("whale-archive: forge succeeded but markdown archive failed", file=sys.stderr)
         print(f"signal={signal_path}", file=sys.stderr)
         print(f"resume: claude --resume {new_id}")
         return 1

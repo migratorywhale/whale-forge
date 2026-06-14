@@ -12,16 +12,16 @@ therefore handles both parts:
 - forge a new JSONL transcript from a recent tail window;
 - optionally register that forged transcript as a Claude Desktop Code session.
 
-The repository is named `whale-forge`; the main script keeps the descriptive
-name `forge-reload.py`.
+The repository is named `whale-forge`; the main CLI is
+`scripts/whale-forge.py`.
 
 ## What It Does
 
-`scripts/forge-reload.py` reads a Claude Code JSONL transcript, keeps a recent
+`scripts/whale-forge.py` reads a Claude Code JSONL transcript, keeps a recent
 tail of user/assistant events, rewrites `sessionId`, rebuilds the `parentUuid`
 chain, and writes a fresh transcript. The source file is never modified.
 
-`scripts/forge-desktop-register.py` is macOS/Claude Desktop specific. It clones
+`scripts/whale-desktop-register.py` is macOS/Claude Desktop specific. It clones
 a `local_*.json` session card under:
 
 ```text
@@ -30,7 +30,7 @@ a `local_*.json` session card under:
 
 and sets the clone's `cliSessionId` to the forged transcript id.
 
-`scripts/forge-archive.py` is a convenience wrapper that can run forge-reload,
+`scripts/whale-archive.py` is a convenience wrapper that can run whale-forge,
 write a signal file, and optionally archive the source JSONL to Markdown if you
 have a `jsonl2md.py` converter.
 
@@ -40,7 +40,7 @@ Run from the same working directory as the Claude Code project you want to
 forge:
 
 ```bash
-python3 scripts/forge-reload.py <old-session-id> \
+python3 scripts/whale-forge.py <old-session-id> \
   --keep-tokens 950000 \
   --threshold 950000 \
   --force
@@ -55,7 +55,7 @@ claude --resume <new-session-id>
 If your transcript is in a different Claude Code project directory:
 
 ```bash
-python3 scripts/forge-reload.py <old-session-id> \
+python3 scripts/whale-forge.py <old-session-id> \
   --project-dir ~/.claude/projects/<project-slug> \
   --force
 ```
@@ -68,18 +68,18 @@ export CLAUDE_PROJECT_DIR="$HOME/.claude/projects/<project-slug>"
 
 ## Claude Desktop
 
-After `forge-reload.py` prints `forged:<new-session-id>`, register it in Claude
+After `whale-forge.py` prints `forged:<new-session-id>`, register it in Claude
 Desktop:
 
 ```bash
-python3 scripts/forge-desktop-register.py <new-session-id> \
+python3 scripts/whale-desktop-register.py <new-session-id> \
   --cli-project-dir ~/.claude/projects/<project-slug>
 ```
 
 Preview first:
 
 ```bash
-python3 scripts/forge-desktop-register.py <new-session-id> \
+python3 scripts/whale-desktop-register.py <new-session-id> \
   --cli-project-dir ~/.claude/projects/<project-slug> \
   --dry-run
 ```
@@ -108,7 +108,7 @@ use `--dry-run` after Desktop updates.
 ## Tests
 
 ```bash
-python3 tests/test_forge_reload.py
+python3 tests/test_whale_forge.py
 ```
 
 The test suite uses synthetic JSONL fixtures and does not touch your real Claude

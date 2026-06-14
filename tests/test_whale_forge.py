@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthetic tests for forge-reload.py."""
+"""Synthetic tests for whale-forge.py."""
 
 from __future__ import annotations
 
@@ -13,11 +13,11 @@ import uuid
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "forge-reload.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "whale-forge.py"
 
 
-def load_forge_module():
-    spec = importlib.util.spec_from_file_location("forge_reload", SCRIPT)
+def load_whale_module():
+    spec = importlib.util.spec_from_file_location("whale_forge", SCRIPT)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load {SCRIPT}")
     module = importlib.util.module_from_spec(spec)
@@ -363,12 +363,12 @@ class ForgeReloadTests(unittest.TestCase):
             self.assertTrue(second_blocks[0]["content"].endswith("...(truncated)"))
             self.assertLessEqual(len(second_blocks[0]["content"]), len("x" * 3000 + "...(truncated)"))
 
-            forge = load_forge_module()
-            ok, reason = forge.validate_tool_results(output)
+            whale = load_whale_module()
+            ok, reason = whale.validate_tool_results(output)
             self.assertTrue(ok, reason)
 
     def test_drops_leading_tool_result_continuation(self):
-        forge = load_forge_module()
+        whale = load_whale_module()
         sid = "source-session"
         orphan_result = event(
             "user",
@@ -400,20 +400,20 @@ class ForgeReloadTests(unittest.TestCase):
             message={"role": "assistant", "content": [{"type": "text", "text": "fresh reply"}]},
         )
 
-        filtered, dropped = forge.filter_events(
-            [forge.Chunk(events=[orphan_result, continuation, human, assistant], tokens=100)]
+        filtered, dropped = whale.filter_events(
+            [whale.Chunk(events=[orphan_result, continuation, human, assistant], tokens=100)]
         )
         self.assertEqual([item["type"] for item in filtered], ["user", "assistant"])
         self.assertEqual(filtered[0]["message"]["content"], "real new user turn")
         self.assertEqual(dropped["leading-continuation:user"], 1)
         self.assertEqual(dropped["leading-continuation:assistant"], 1)
 
-        rebuilt = forge.rebuild_events(filtered, "forged-session", None, None)
-        ok, reason = forge.validate_tool_results(rebuilt)
+        rebuilt = whale.rebuild_events(filtered, "forged-session", None, None)
+        ok, reason = whale.validate_tool_results(rebuilt)
         self.assertTrue(ok, reason)
 
     def test_image_only_user_gets_text_placeholder(self):
-        forge = load_forge_module()
+        whale = load_whale_module()
         sid = "source-session"
         image_user = event(
             "user",
@@ -439,10 +439,10 @@ class ForgeReloadTests(unittest.TestCase):
             message={"role": "assistant", "content": [{"type": "text", "text": "saw image"}]},
         )
 
-        rebuilt = forge.rebuild_events([image_user, assistant], "forged-session", None, None)
+        rebuilt = whale.rebuild_events([image_user, assistant], "forged-session", None, None)
         blocks = rebuilt[0]["message"]["content"]
-        self.assertEqual(blocks, [{"type": "text", "text": forge.OMITTED_IMAGE_TEXT}])
-        ok, reason = forge.validate_nonempty_user_messages(rebuilt)
+        self.assertEqual(blocks, [{"type": "text", "text": whale.OMITTED_IMAGE_TEXT}])
+        ok, reason = whale.validate_nonempty_user_messages(rebuilt)
         self.assertTrue(ok, reason)
 
 

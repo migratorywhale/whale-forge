@@ -20,12 +20,12 @@ normal session.
 
 ## Files
 
-- `scripts/forge-reload.py` creates a fresh Claude Code JSONL transcript.
-- `scripts/forge-archive.py` wraps forge-reload, writes a signal file, and can
+- `scripts/whale-forge.py` creates a fresh Claude Code JSONL transcript.
+- `scripts/whale-archive.py` wraps whale-forge, writes a signal file, and can
   archive the source JSONL to Markdown.
-- `scripts/forge-desktop-register.py` clones a Claude Desktop Code session card
+- `scripts/whale-desktop-register.py` clones a Claude Desktop Code session card
   and points the clone at a forged transcript.
-- `tests/test_forge_reload.py` covers parent-chain rebuild, tool primer
+- `tests/test_whale_forge.py` covers parent-chain rebuild, tool primer
   insertion, image placeholders, and non-empty user-message validation.
 
 ## CLI-only flow
@@ -33,7 +33,7 @@ normal session.
 From the same working directory as the Claude Code project you want to forge:
 
 ```bash
-python3 scripts/forge-reload.py <old-session-id> \
+python3 scripts/whale-forge.py <old-session-id> \
   --keep-tokens 950000 \
   --threshold 950000 \
   --force
@@ -55,7 +55,7 @@ If the transcript lives under a different Claude Code project directory, pass it
 explicitly:
 
 ```bash
-python3 scripts/forge-reload.py <old-session-id> \
+python3 scripts/whale-forge.py <old-session-id> \
   --project-dir ~/.claude/projects/<project-slug> \
   --force
 ```
@@ -73,7 +73,7 @@ Claude Desktop Code mode stores local session cards here on macOS:
 Those cards contain a `cliSessionId`. After forging a transcript, register it:
 
 ```bash
-python3 scripts/forge-desktop-register.py <new-session-id> \
+python3 scripts/whale-desktop-register.py <new-session-id> \
   --cli-project-dir ~/.claude/projects/<project-slug>
 ```
 
@@ -90,7 +90,7 @@ The register script:
 Use `--dry-run` first when testing:
 
 ```bash
-python3 scripts/forge-desktop-register.py <new-session-id> \
+python3 scripts/whale-desktop-register.py <new-session-id> \
   --cli-project-dir ~/.claude/projects/<project-slug> \
   --dry-run
 ```
@@ -100,10 +100,10 @@ Then restart or refresh Claude Desktop and open the new card. Its title includes
 
 ## Archive wrapper
 
-`forge-archive.py` is a local convenience wrapper:
+`whale-archive.py` is a local convenience wrapper:
 
 ```bash
-python3 scripts/forge-archive.py <old-session-id> \
+python3 scripts/whale-archive.py <old-session-id> \
   --project-dir ~/.claude/projects/<project-slug> \
   --keep-tokens 950000 \
   --threshold 950000 \
@@ -113,23 +113,23 @@ python3 scripts/forge-archive.py <old-session-id> \
 It writes:
 
 ```text
-~/.claude/forge-ready/<old-session-id>.signal
+~/.claude/whale-ready/<old-session-id>.signal
 ```
 
 with the new session id. If `jsonl2md.py` is available, it also archives the old
 session to Markdown. Override paths with:
 
-- `FORGE_RELOAD_SCRIPT`
+- `WHALE_FORGE_SCRIPT`
 - `JSONL2MD_SCRIPT`
-- `FORGE_ARCHIVE_DIR`
-- `FORGE_SIGNAL_DIR`
+- `WHALE_ARCHIVE_DIR`
+- `WHALE_SIGNAL_DIR`
 
 ## Guardrails
 
 Whale Forge intentionally preserves the source JSONL. It writes only new
 transcripts and, for Desktop registration, new local session cards.
 
-Important safeguards in `forge-reload.py`:
+Important safeguards in `whale-forge.py`:
 
 - rebuilds the parent chain from scratch;
 - starts from a real human-visible user message;

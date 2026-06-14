@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Register a forged Claude Code transcript in Claude Desktop.
 
-forge-reload.py creates a fresh CLI transcript under ~/.claude/projects.
+whale-forge.py creates a fresh CLI transcript under ~/.claude/projects.
 Claude Desktop's Code UI has an extra local session card:
 
     ~/Library/Application Support/Claude/claude-code-sessions/*/*/local_*.json
