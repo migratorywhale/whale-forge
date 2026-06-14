@@ -1,6 +1,6 @@
-# Forge Reload for Claude Code
+# Whale Forge for Claude Code
 
-Forge Reload is an experimental way to continue a large Claude Code session
+Whale Forge is an experimental way to continue a large Claude Code session
 without asking the model to summarize itself first.
 
 The basic idea:
@@ -126,7 +126,7 @@ session to Markdown. Override paths with:
 
 ## Guardrails
 
-Forge Reload intentionally preserves the source JSONL. It writes only new
+Whale Forge intentionally preserves the source JSONL. It writes only new
 transcripts and, for Desktop registration, new local session cards.
 
 Important safeguards in `forge-reload.py`:

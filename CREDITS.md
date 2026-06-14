@@ -1,6 +1,6 @@
 # Credits
 
-Forge Reload came out of a real Claude Code continuity problem: a transcript
+Whale Forge came out of a real Claude Code continuity problem: a transcript
 could be forged correctly at the JSONL layer, yet Claude Desktop still woke up
 without seeing the carried context.
 

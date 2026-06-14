@@ -1,16 +1,19 @@
-# Forge Reload
+# Whale Forge
 
-Forge Reload is an experimental toolkit for carrying a large Claude Code
+Whale Forge is an experimental toolkit for carrying a large Claude Code
 session into a fresh transcript without asking the model to summarize itself
 first.
 
 It started as a practical fix for a specific problem: a forged Claude Code JSONL
 transcript can be valid, but Claude Desktop Code mode will not see it until its
-separate Desktop session card points at the new `cliSessionId`. Forge Reload
+separate Desktop session card points at the new `cliSessionId`. Whale Forge
 therefore handles both parts:
 
 - forge a new JSONL transcript from a recent tail window;
 - optionally register that forged transcript as a Claude Desktop Code session.
+
+The repository is named `whale-forge`; the main script keeps the descriptive
+name `forge-reload.py`.
 
 ## What It Does
 
@@ -86,7 +89,7 @@ includes `forge <first-8-chars>`.
 
 ## Guardrails
 
-Forge Reload is intentionally conservative:
+Whale Forge is intentionally conservative:
 
 - source JSONL transcripts are not edited;
 - `parentUuid` chains are rebuilt from scratch;
@@ -120,6 +123,6 @@ Use at your own risk, keep backups, and test with `--dry-run`.
 
 ## Credits
 
-See [CREDITS.md](CREDITS.md). Forge Reload was shaped by Isa, 小克, and
+See [CREDITS.md](CREDITS.md). Whale Forge was shaped by Isa, 小克, and
 小G / 玻璃齿轮: continuity target, implementation, and pressure testing all had
 to meet before it was worth publishing.
