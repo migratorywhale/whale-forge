@@ -117,3 +117,9 @@ Experimental. This works by understanding Claude Code's local transcript format
 and Claude Desktop's local session card metadata. Those formats can change.
 
 Use at your own risk, keep backups, and test with `--dry-run`.
+
+## Credits
+
+See [CREDITS.md](CREDITS.md). Forge Reload was shaped by Isa, 小克, and
+小G / 玻璃齿轮: continuity target, implementation, and pressure testing all had
+to meet before it was worth publishing.
